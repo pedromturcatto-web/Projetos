@@ -1,303 +1,193 @@
-import java.util.Scanner;
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 
-public class QuizJogo {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+const perguntas = [
+  {
+    texto:
+      "\nQual lendário feiticeiro unicórnio criou o feitiço que transformou Twilight em Alicórnio? ",
+    respostasAceitas: [
+      "star swirl",
+      "star swirl, o barbudo",
+      "star swirl o barbudo",
+    ],
+  },
+  {
+    texto:
+      "\nQual manobra aérea lendária Rainbow Dash realizou quando era potra? ",
+    respostasAceitas: [
+      "explosão sônica do arco-íris",
+      "explosao sonica do arco-iris",
+      "sonic rainboom",
+    ],
+  },
+  {
+    texto:
+      "\nQual vilã metamorfa assumiu a identidade da Princesa Cadance no casamento real? ",
+    respostasAceitas: ["rainha chrysalis", "chrysalis"],
+  },
+  {
+    texto:
+      "\nQual é o nome do quarteto vocal a cappella do qual Big Mac faz parte? ",
+    respostasAceitas: [
+      "os pôneis tonais",
+      "pôneis tonais",
+      "poneis tonais",
+    ],
+  },
+  {
+    texto:
+      "\nEm que tipo de fazenda Pinkie Pie cresceu antes de ir para Ponyville? ",
+    respostasAceitas: ["fazenda de pedras", "pedras"],
+  },
+  {
+    texto: "\nQual é o nome do coelhinho de estimação da Fluttershy? ",
+    respostasAceitas: ["angel"],
+  },
+  {
+    texto:
+      "\nQual é o nome da boutique de moda que Rarity administra em Ponyville? ",
+    respostasAceitas: ["boutique carrossel", "carrossel"],
+  },
+  {
+    texto:
+      "\nQuem é a irmã mais nova da Princesa Celestia que cuida da Lua? ",
+    respostasAceitas: ["princesa luna", "luna"],
+  },
+  {
+    texto:
+      "\nComo se chama o clube de Apple Bloom, Sweetie Belle e Scootaloo? ",
+    respostasAceitas: [
+      "pretendentes à cutie mark",
+      "pretendentes a cutie mark",
+      "cutie mark crusaders",
+    ],
+  },
+  {
+    texto:
+      "\nQual criatura draconequus representa o espírito do caos em Equestria? ",
+    respostasAceitas: ["discórdia", "discordia", "discord"],
+  },
+  {
+    texto:
+      "\nEm Equestria Girls, qual ex-aluna de Celestia rouba a coroa de Twilight? ",
+    respostasAceitas: ["sunset shimmer", "sunset"],
+  },
+  {
+    texto:
+      "\nQual é o nome da banda musical das garotas de Canterlot High? ",
+    respostasAceitas: ["as rainbooms", "rainbooms"],
+  },
+  {
+    texto:
+      "\nQual é o nome do trio de sereias vilãs em Rainbow Rocks? ",
+    respostasAceitas: ["as dazzlings", "dazzlings"],
+  },
+  {
+    texto:
+      "\nQual é o nome da escola rival de Canterlot High nos Jogos da Amizade? ",
+    respostasAceitas: ["crystal prep", "academia crystal prep"],
+  },
+  {
+    texto:
+      "\nEm Equestria Girls: A Lenda de Everfree, o que as garotas ganham na caverna mágica? ",
+    respostasAceitas: ["superpoderes", "poderes", "geodos"],
+  },
+  {
+    texto:
+      "\nQual antigo tirano unicórnio escravizou o Império do Cristal? ",
+    respostasAceitas: ["rei sombra", "sombra"],
+  },
+  {
+    texto:
+      "\nQual unicórnio alterou o passado para impedir a Explosão Sônica do Arco-Íris? ",
+    respostasAceitas: ["starlight glimmer", "starlight"],
+  },
+  {
+    texto:
+      "\nQual é o nome da filha da Princesa Cadance e de Shining Armor? ",
+    respostasAceitas: ["flurry heart", "princesa flurry heart"],
+  },
+  {
+    texto:
+      "\nQual é o nome da tartaruga de estimação de Rainbow Dash? ",
+    respostasAceitas: ["tank"],
+  },
+  {
+    texto:
+      "\nQual artefato mágico corrompeu Trixie Lulamoon durante seu duelo com Twilight? ",
+    respostasAceitas: ["amuleto do alicórnio", "amuleto do alicornio"],
+  },
+  {
+    texto:
+      "\nQuem se tornou a Senhora dos Dragões após vencer o Desafio de Fogo com Spike? ",
+    respostasAceitas: ["ember", "princesa ember"],
+  },
+  {
+    texto:
+      "\nQuantos Pilares da Antiga Equestria plantaram a semente da Árvore da Harmonia? ",
+    respostasAceitas: ["6"],
+  },
+  {
+    texto:
+      "\nQual é o nome da forma sombria em que Sci-Twi se transformou nos Jogos da Amizade? ",
+    respostasAceitas: ["midnight sparkle"],
+  },
+  {
+    texto:
+      "\nQuem assumiu a identidade de Gaia Everfree no Acampamento Everfree? ",
+    respostasAceitas: ["gloriosa daisy", "gloriosa"],
+  },
+  {
+    texto:
+      "\nQual artefato Wallflower Blush usou para apagar as memórias sobre Sunset Shimmer? ",
+    respostasAceitas: [
+      "pedra da memória",
+      "a pedra da memória",
+      "pedra da memoria",
+    ],
+  },
+];
 
-        int pontos = 0;
-        int erros = 0;
+async function jogarQuiz() {
+  const rl = readline.createInterface({ input, output });
 
-        System.out.println("=== QUIZ DE EQUESTRIA (MY LITTLE PONY & EQUESTRIA GIRLS) ===");
-        System.out.print("Digite o nome do jogador(a): ");
-        String jogador = scanner.nextLine();
+  let pontos = 0;
+  let erros = 0;
 
-        long tempoInicio = System.currentTimeMillis();
+  try {
+    console.log(
+      "=== QUIZ DE EQUESTRIA (MY LITTLE PONY & EQUESTRIA GIRLS) ==="
+    );
+    const jogador = await rl.question("Digite o nome do jogador(a): ");
 
-        // Pergunta 1
-        System.out.print("\nQual lendário feiticeiro unicórnio criou o feitiço que transformou Twilight em Alicórnio? ");
-        String perguntaUm = scanner.nextLine().trim().toLowerCase();
-        if (perguntaUm.equals("star swirl") || perguntaUm.equals("star swirl, o barbudo") || perguntaUm.equals("star swirl o barbudo")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
+    const tempoInicio = performance.now();
 
-        // Pergunta 2
-        System.out.print("\nQual manobra aérea lendária Rainbow Dash realizou quando era potra? ");
-        String perguntaDois = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDois.equals("explosão sônica do arco-íris") || perguntaDois.equals("explosao sonica do arco-iris") || perguntaDois.equals("sonic rainboom")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
+    for (const pergunta of perguntas) {
+      const resposta = (await rl.question(pergunta.texto))
+        .trim()
+        .toLowerCase();
 
-        // Pergunta 3
-        System.out.print("\nQual vilã metamorfa assumiu a identidade da Princesa Cadance no casamento real? ");
-        String perguntaTres = scanner.nextLine().trim().toLowerCase();
-        if (perguntaTres.equals("rainha chrysalis") || perguntaTres.equals("chrysalis")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 4
-        System.out.print("\nQual é o nome do quarteto vocal a cappella do qual Big Mac faz parte? ");
-        String perguntaQuatro = scanner.nextLine().trim().toLowerCase();
-        if (perguntaQuatro.equals("os pôneis tonais") || perguntaQuatro.equals("pôneis tonais") || perguntaQuatro.equals("poneis tonais")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 5
-        System.out.print("\nEm que tipo de fazenda Pinkie Pie cresceu antes de ir para Ponyville? ");
-        String perguntaCinco = scanner.nextLine().trim().toLowerCase();
-        if (perguntaCinco.equals("fazenda de pedras") || perguntaCinco.equals("pedras")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 6
-        System.out.print("\nQual é o nome do coelhinho de estimação da Fluttershy? ");
-        String perguntaSeis = scanner.nextLine().trim().toLowerCase();
-        if (perguntaSeis.equals("angel")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 7
-        System.out.print("\nQual é o nome da boutique de moda que Rarity administra em Ponyville? ");
-        String perguntaSete = scanner.nextLine().trim().toLowerCase();
-        if (perguntaSete.equals("boutique carrossel") || perguntaSete.equals("carrossel")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 8
-        System.out.print("\nQuem é a irmã mais nova da Princesa Celestia que cuida da Lua? ");
-        String perguntaOito = scanner.nextLine().trim().toLowerCase();
-        if (perguntaOito.equals("princesa luna") || perguntaOito.equals("luna")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 9
-        System.out.print("\nComo se chama o clube de Apple Bloom, Sweetie Belle e Scootaloo? ");
-        String perguntaNove = scanner.nextLine().trim().toLowerCase();
-        if (perguntaNove.equals("pretendentes à cutie mark") || perguntaNove.equals("pretendentes a cutie mark") || perguntaNove.equals("cutie mark crusaders")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 10
-        System.out.print("\nQual criatura draconequus representa o espírito do caos em Equestria? ");
-        String perguntaDez = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDez.equals("discórdia") || perguntaDez.equals("discordia") || perguntaDez.equals("discord")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 11
-        System.out.print("\nEm Equestria Girls, qual ex-aluna de Celestia rouba a coroa de Twilight? ");
-        String perguntaOnze = scanner.nextLine().trim().toLowerCase();
-        if (perguntaOnze.equals("sunset shimmer") || perguntaOnze.equals("sunset")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 12
-        System.out.print("\nQual é o nome da banda musical das garotas de Canterlot High? ");
-        String perguntaDoze = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDoze.equals("as rainbooms") || perguntaDoze.equals("rainbooms")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 13
-        System.out.print("\nQual é o nome do trio de sereias vilãs em Rainbow Rocks? ");
-        String perguntaTreze = scanner.nextLine().trim().toLowerCase();
-        if (perguntaTreze.equals("as dazzlings") || perguntaTreze.equals("dazzlings")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 14
-        System.out.print("\nQual é o nome da escola rival de Canterlot High nos Jogos da Amizade? ");
-        String perguntaQuatorze = scanner.nextLine().trim().toLowerCase();
-        if (perguntaQuatorze.equals("crystal prep") || perguntaQuatorze.equals("academia crystal prep")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 15
-        System.out.print("\nEm Equestria Girls: A Lenda de Everfree, o que as garotas ganham na caverna mágica? ");
-        String perguntaQuinze = scanner.nextLine().trim().toLowerCase();
-        if (perguntaQuinze.equals("superpoderes") || perguntaQuinze.equals("poderes") || perguntaQuinze.equals("geodos")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 16
-        System.out.print("\nQual antigo tirano unicórnio escravizou o Império do Cristal? ");
-        String perguntaDezesseis = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDezesseis.equals("rei sombra") || perguntaDezesseis.equals("sombra")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 17
-        System.out.print("\nQual unicórnio alterou o passado para impedir a Explosão Sônica do Arco-Íris? ");
-        String perguntaDezessete = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDezessete.equals("starlight glimmer") || perguntaDezessete.equals("starlight")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 18
-        System.out.print("\nQual é o nome da filha da Princesa Cadance e de Shining Armor? ");
-        String perguntaDezoito = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDezoito.equals("flurry heart") || perguntaDezoito.equals("princesa flurry heart")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 19
-        System.out.print("\nQual é o nome da tartaruga de estimação de Rainbow Dash? ");
-        String perguntaDezenove = scanner.nextLine().trim().toLowerCase();
-        if (perguntaDezenove.equals("tank")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 20
-        System.out.print("\nQual artefato mágico corrompeu Trixie Lulamoon durante seu duelo com Twilight? ");
-        String perguntaVinte = scanner.nextLine().trim().toLowerCase();
-        if (perguntaVinte.equals("amuleto do alicórnio") || perguntaVinte.equals("amuleto do alicornio")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 21
-        System.out.print("\nQuem se tornou a Senhora dos Dragões após vencer o Desafio de Fogo com Spike? ");
-        String perguntaVinteUm = scanner.nextLine().trim().toLowerCase();
-        if (perguntaVinteUm.equals("ember") || perguntaVinteUm.equals("princesa ember")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 22
-        System.out.print("\nQuantos Pilares da Antiga Equestria plantaram a semente da Árvore da Harmonia? ");
-        int perguntaVinteDois = Integer.parseInt(scanner.nextLine().trim());
-        if (perguntaVinteDois == 6) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 23
-        System.out.print("\nQual é o nome da forma sombria em que Sci-Twi se transformou nos Jogos da Amizade? ");
-        String perguntaVinteTres = scanner.nextLine().trim().toLowerCase();
-        if (perguntaVinteTres.equals("midnight sparkle")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 24
-        System.out.print("\nQuem assumiu a identidade de Gaia Everfree no Acampamento Everfree? ");
-        String perguntaVinteQuatro = scanner.nextLine().trim().toLowerCase();
-        if (perguntaVinteQuatro.equals("gloriosa daisy") || perguntaVinteQuatro.equals("gloriosa")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        // Pergunta 25
-        System.out.print("\nQual artefato Wallflower Blush usou para apagar as memórias sobre Sunset Shimmer? ");
-        String perguntaVinteCinco = scanner.nextLine().trim().toLowerCase();
-        if (perguntaVinteCinco.equals("pedra da memória") || perguntaVinteCinco.equals("a pedra da memória") || perguntaVinteCinco.equals("pedra da memoria")) {
-            pontos++;
-            System.out.println("Parabéns, você acertou!");
-        } else {
-            erros++;
-            System.out.println("Você errou! hahaha");
-        }
-
-        long tempoFim = System.currentTimeMillis();
-        double tempoTotalSegundos = (tempoFim - tempoInicio) / 1000.0;
-
-        System.out.println("\n==========================================");
-        System.out.println("CLASSIFICAÇÃO FINAL - JOGADOR: " + jogador);
-        System.out.println("Acertos: " + pontos + " / 25");
-        System.out.println("Erros: " + erros);
-        System.out.printf("Tempo gasto: %.2f segundos\n", tempoTotalSegundos);
-        System.out.println("==========================================");
-
-        scanner.close();
+      if (pergunta.respostasAceitas.includes(resposta)) {
+        pontos++;
+        console.log("Parabéns, você acertou!");
+      } else {
+        erros++;
+        console.log("Você errou! hahaha");
+      }
     }
+
+    const tempoFim = performance.now();
+    const tempoTotalSegundos = (tempoFim - tempoInicio) / 1000;
+
+    console.log("\n==========================================");
+    console.log(`CLASSIFICAÇÃO FINAL - JOGADOR: ${jogador}`);
+    console.log(`Acertos: ${pontos} / ${perguntas.length}`);
+    console.log(`Erros: ${erros}`);
+    console.log(`Tempo gasto: ${tempoTotalSegundos.toFixed(2)} segundos`);
+    console.log("==========================================");
+  } finally {
+    rl.close();
+  }
 }
+
+jogarQuiz();
